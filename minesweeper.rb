@@ -1,5 +1,4 @@
 require 'matrix'
-require 'byebug'
 
 class MinesweeperBoard
   attr_reader :field, :buried
@@ -11,14 +10,19 @@ class MinesweeperBoard
 
   def bury_mines(size, num_mines)
     num_mines.times do 
-      row = rand(0..size-1)
-      col = rand(0..size-1)
-      target = @buried[row][col] 
-      if target == "."
-        @buried[row][col] = "M"
-      #FIX IF ALREADY M VALUE
-      end
+      set_mine_location(size)
     end 
+  end
+
+  def set_mine_location(size)
+    row = rand(0..size-1)
+    col = rand(0..size-1)
+    target = @buried[row][col]
+    if target == "."
+      @buried[row][col] = "M"
+    else
+      set_mine_location(size)
+    end
   end
 
 end
@@ -29,7 +33,6 @@ class MinesweeperGame
     @size = gets.chomp.to_i
     puts "How many mines to bury, 1 to #{@size**2}?"
     @num_mines = gets.chomp.to_i
-    # byebug
     board = MinesweeperBoard.new(@size, @num_mines)
     @field = board.field
     @buried = board.buried
