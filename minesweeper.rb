@@ -28,37 +28,20 @@ class MinesweeperBoard
 end
 
 class MinesweeperGame
-  attr_reader :solved
-  def initialize
-    puts "Enter the size of the minesweeper board!"
-    @size = gets.chomp.to_i
-    puts "How many mines to bury, 1 to #{@size**2}?"
-    @num_mines = gets.chomp.to_i
-    board = MinesweeperBoard.new(@size, @num_mines)
+  attr_reader :board
+  def initialize(size, num_mines)
+    @board = MinesweeperBoard.new(size, num_mines)
     @field = board.field
     @buried = board.buried
     @loser = false
-    @solved = false
-    play
   end
 
-  def play
-    if checkable_spots? && @loser == false
-      print @field
-      puts "Where do you want to check? Pick a row from 1 to #{@size}!"
-      row = gets.chomp.to_i-1
-      puts "Pick a column from 1 to #{@size}!"
-      col = gets.chomp.to_i-1
-      check_if_mine(row, col)
-      play
-    elsif @loser == false
-      @solved = true
-      puts "YOU WIN!"
-    else
-      puts "MINE EXPLOSION! GAME OVER!"
-      print @buried
-      return
-    end
+  def solved?
+    !checkable_spots? && @loser == false
+  end
+
+  def loser?
+    @loser == true
   end
 
   def checkable_spots?
@@ -72,12 +55,47 @@ class MinesweeperGame
     else
       @field[row][col] = target
       @buried[row][col] = " "
-      puts "This one's clear!"
     end
     @field
   end
 
 end
 
-game = MinesweeperGame.new
+class MinesweeperUserInput
+  def run
+    start
+    play
+  end
+
+  def start
+    puts "Enter the size of the minesweeper board!"
+    @size = gets.chomp.to_i
+    puts "How many mines to bury, 1 to #{@size**2}?"
+    @num_mines = gets.chomp.to_i
+    @game = MinesweeperGame.new(@size, @num_mines)
+  end
+
+  def play
+    print @game.board.field
+    puts "Where do you want to check? Pick a row from 1 to #{@size}!"
+    row = gets.chomp.to_i-1
+    puts "Pick a column from 1 to #{@size}!"
+    col = gets.chomp.to_i-1
+    @game.check_if_mine(row, col)
+    if @game.solved?
+      puts "YOU WIN!"
+      print @game.board.buried
+    elsif @game.loser?
+      puts "GAME OVER!"
+      print @game.board.buried
+    else
+      puts "That one was clear!"
+      play
+    end
+  end
+end
+
+if __FILE__ == $0
+  MinesweeperUserInput.new.run
+end
 
