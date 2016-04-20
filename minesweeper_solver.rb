@@ -1,4 +1,3 @@
-require 'byebug'
 require './minesweeper'
 module MinesweeperSolver
   module_function
@@ -9,12 +8,9 @@ module MinesweeperSolver
       results << play_single_game
     end
     print results.select { |r| r }.length
-    # results.select(&:loser?)
-
   end
 
   def play_single_game
-
     game = MinesweeperGame.new(10,1) 
     while !game.solved? && !game.loser? do
       row = rand(0..9)
@@ -24,8 +20,6 @@ module MinesweeperSolver
         puts "#{row}, #{col}"
         puts "#{game.board.buried}"
       end
-      # puts "is loser? #{game.loser?}"
-      # puts "is solved? #{game.solved?}"
     end
     game.solved?
   end
