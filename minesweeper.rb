@@ -28,6 +28,7 @@ class MinesweeperBoard
 end
 
 class MinesweeperGame
+  attr_reader :solved
   def initialize
     puts "Enter the size of the minesweeper board!"
     @size = gets.chomp.to_i
@@ -36,12 +37,13 @@ class MinesweeperGame
     board = MinesweeperBoard.new(@size, @num_mines)
     @field = board.field
     @buried = board.buried
-    @finished = false
+    @loser = false
+    @solved = false
     play
   end
 
   def play
-    while @buried.flatten.include?(".") && @finished == false
+    if checkable_spots? && @loser == false
       print @field
       puts "Where do you want to check? Pick a row from 1 to #{@size}!"
       row = gets.chomp.to_i-1
@@ -49,18 +51,27 @@ class MinesweeperGame
       col = gets.chomp.to_i-1
       check_if_mine(row, col)
       play
+    elsif @loser == false
+      @solved = true
+      puts "YOU WIN!"
+    else
+      puts "MINE EXPLOSION! GAME OVER!"
+      print @buried
+      return
     end
+  end
+
+  def checkable_spots?
+    @buried.flatten.include?(".")
   end
 
   def check_if_mine(row, col)
     target = @buried[row][col]
     if target == "M"
-      puts "MINE EXPLOSION! GAME OVER!"
-      print @buried
-      @finished = true
-      return
+      @loser = true
     else
       @field[row][col] = target
+      @buried[row][col] = " "
       puts "This one's clear!"
     end
     @field
